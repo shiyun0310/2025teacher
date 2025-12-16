@@ -128,7 +128,7 @@
                         114年度優良教師名單
                     </h2>
                     <p class="text-blue-200/80 text-lg max-w-xl font-light">
-                        恭喜您獲選優良教師，並感謝您以專業與熱忱，持續培育優秀的醫學人才，奇美有您，更加卓越！
+                        恭喜您獲選為本年度優良教師，並感謝您以專業與熱忱，持續培育優秀的醫學人才，奇美因為有您，才更加卓越！
                     </p>
                 </div>
                 <div class="hidden md:block">
@@ -486,15 +486,23 @@
                             </div>
                         </div>
                     </div>
-                    <p class="text-slate-600 mb-4">謹訂於 12/26(五)16:45 於 552 會議室辦理受獎事宜，敬請撥冗出席領獎！</p>
+                    <p class="text-slate-600 mb-4">謹訂於 12/26(五)16:45 於 552 會議室辦理受獎事宜，<br>敬請撥冗出席領獎！</p>
                 `,
                 icon: 'success',
-                showCancelButton: true,
+                
+                showConfirmButton: true,
                 confirmButtonText: '收到，我會出席領獎',
-                cancelButtonText: '抱歉，不克出席領獎',
                 confirmButtonColor: '#9333ea',
-                cancelButtonColor: '#64748b',
+                
+                showDenyButton: true,
+                denyButtonText: '抱歉，不克出席領獎',
+                denyButtonColor: '#64748b',
+                
+                showCancelButton: false,
+                
                 showLoaderOnConfirm: true,
+                showLoaderOnDeny: true,
+                
                 preConfirm: async () => {
                     try {
                         const res = await sendResponseToSheet(member.id, "出席領獎");
@@ -503,43 +511,32 @@
                     } catch (error) {
                         Swal.showValidationMessage(`寫入失敗: ${error}`);
                     }
+                },
+
+                preDeny: async () => {
+                    try {
+                        const res = await sendResponseToSheet(member.id, "不克出席");
+                        if (!res.success) throw new Error(res.message);
+                        return res;
+                    } catch (error) {
+                        Swal.showValidationMessage(`寫入失敗: ${error}`);
+                        return false;
+                    }
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         icon: 'success',
-                        title: '回覆成功',
-                        text: '已記錄您的出席意願，感謝您！',
+                        title: '',
+                        text: '已收到您的回覆，謝謝',
                         confirmButtonColor: '#9333ea'
                     });
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                } else if (result.isDenied) {
                     Swal.fire({
-                        title: '確認不克出席嗎？',
-                        text: "我們將記錄您的狀態。",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: '確定不克出席',
-                        cancelButtonText: '返回',
-                        confirmButtonColor: '#64748b',
-                        showLoaderOnConfirm: true,
-                        preConfirm: async () => {
-                            try {
-                                const res = await sendResponseToSheet(member.id, "不克出席");
-                                if (!res.success) throw new Error(res.message);
-                                return res;
-                            } catch (error) {
-                                Swal.showValidationMessage(`寫入失敗: ${error}`);
-                            }
-                        }
-                    }).then((res) => {
-                        if (res.isConfirmed) {
-                            Swal.fire({
-                                icon: 'info',
-                                title: '已記錄',
-                                text: '期待下次有機會再見！',
-                                confirmButtonColor: '#64748b'
-                            });
-                        }
+                        icon: 'success', // Changed to success icon (checkmark)
+                        title: '',
+                        text: '已收到您的回覆，謝謝',
+                        confirmButtonColor: '#64748b'
                     });
                 }
             });
@@ -562,7 +559,6 @@
 
             searchBtn.classList.add('btn-loading');
 
-            // 強制重新抓取，確保讀到最新狀態
             await fetchSheetData();
 
             let foundMember = null;
@@ -585,7 +581,6 @@
 
             if (foundMember) {
                 if (foundMember.responseStatus) {
-                    // 處理時間顯示格式：確保顯示為 mm/dd hh:mm
                     let displayTime = foundMember.responseTime || '';
                     if (displayTime && (displayTime.includes('GMT') || displayTime.length > 20)) {
                         try {
@@ -597,7 +592,6 @@
                         } catch (e) {}
                     }
 
-                    // 修改：只顯示狀態，不提供修改按鈕
                     Swal.fire({
                         title: '您已完成回覆',
                         html: `
@@ -609,7 +603,7 @@
                             </div>
                         `,
                         icon: 'info',
-                        showCancelButton: false, // 隱藏取消/修改按鈕
+                        showCancelButton: false,
                         confirmButtonText: '關閉',
                         confirmButtonColor: '#64748b'
                     });
