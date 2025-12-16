@@ -104,9 +104,8 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30">
-                        奇
-                    </div>
+                    <!-- 修改：左上角 Logo 改為圖片 -->
+                    <img src="https://github.com/shiyun0310/2025teacher/blob/main/logo-green%20(4).png?raw=true" class="w-8 h-8 rounded-lg shadow-lg shadow-blue-500/30 object-cover">
                     <h1 class="text-lg font-bold text-slate-700 tracking-tight hidden sm:block">
                         奇美醫學中心 <span class="text-slate-400 font-normal">|</span> 優良教師名單
                     </h1>
@@ -115,6 +114,7 @@
         </div>
     </nav>
 
+    <!-- 主要內容 -->
     <main class="pt-28 px-4 sm:px-6 max-w-5xl mx-auto">
 
         <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 via-blue-900 to-slate-800 rounded-2xl p-8 mb-10 shadow-2xl shadow-blue-900/20 text-white animate__animated animate__fadeIn">
@@ -240,11 +240,13 @@
                 category: "傑出教師",
                 colorClass: "orange", 
                 icon: "crown",
+                description: "教學成效卓越，足為全院楷模",
                 members: [
                     { name: "謝昆霖", dept: "泌尿外科", title: "醫師", rank: "傑出" },
                     { name: "陳昱廷", dept: "外科部", title: "醫師", rank: "傑出" },
                     { name: "李俊育", dept: "牙醫部", title: "醫師", rank: "傑出" },
-                    { name: "吳柏勳", dept: "護理部", title: "副護理長", rank: "傑出" },
+                    // 修改：吳柏勳 -> 吳柏勲
+                    { name: "吳柏勲", dept: "護理部", title: "副護理長", rank: "傑出" },
                     { name: "黃貞瑗", dept: "護理部", title: "副護理長", rank: "傑出" },
                     { name: "莊佩華", dept: "護理部", title: "小組長", rank: "傑出" },
                     { name: "陳乃瑗", dept: "護理部", title: "小組長", rank: "傑出" },
@@ -559,6 +561,7 @@
 
             searchBtn.classList.add('btn-loading');
 
+            // 強制重新抓取，確保讀到最新狀態
             await fetchSheetData();
 
             let foundMember = null;
@@ -581,6 +584,7 @@
 
             if (foundMember) {
                 if (foundMember.responseStatus) {
+                    // 處理時間顯示格式：確保顯示為 mm/dd hh:mm
                     let displayTime = foundMember.responseTime || '';
                     if (displayTime && (displayTime.includes('GMT') || displayTime.length > 20)) {
                         try {
@@ -592,6 +596,7 @@
                         } catch (e) {}
                     }
 
+                    // 修改：只顯示狀態，不提供修改按鈕
                     Swal.fire({
                         title: '您已完成回覆',
                         html: `
@@ -603,7 +608,7 @@
                             </div>
                         `,
                         icon: 'info',
-                        showCancelButton: false,
+                        showCancelButton: false, // 隱藏取消/修改按鈕
                         confirmButtonText: '關閉',
                         confirmButtonColor: '#64748b'
                     });
